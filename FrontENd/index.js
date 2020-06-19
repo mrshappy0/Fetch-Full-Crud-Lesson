@@ -1,53 +1,39 @@
-document.addEventListener('DOMContentLoaded', ()=>{
-  const commentsUl = document.getElementById('commentsUl')
-  const submitButton = document.getElementById('submit_Button')
-  const textBox = document.getElementById('comments_input')
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("One DOM Boi Loaded");
+  fetch("http://localhost:3000/comments")
+    .then(response => response.json())
+    .then(result => handleCommentData(result));
 
-  fetch('http://localhost:3000/comments')
-  .then(response => response.json())
-  .then(result => {
-    console.log(result)
-    renderComments(result)
-  })
-
-  function renderComments(result){
-    result.map(comment =>{
-      let li = document.createElement('li')
-      li.innerText = comment.content
-      let deleteButton = document.createElement('button')
-      deleteButton.innerText = 'delete'
-      deleteButton.addEventListener('click', ()=>{
-        event.target.parentNode.remove()
-        deleteComment(comment.id)
-      })
-      li.appendChild(deleteButton)
-      commentsUl.appendChild(li)
-    })
-  }
- 
-  submitButton.addEventListener('click', ()=>{
-    event.preventDefault()
-    let newComment = textBox.value
-    postComment(newComment)
-  })
-
-  function postComment(newComment){
-    fetch('http://localhost:3000/comments',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'Accept':'application/json'
-      },
-      body:JSON.stringify({content:newComment})
-    })
+  function handleCommentData(comments) {
+    console.table(comments);
+    comments.map(comment => {
+      renderId(comment);
+      renderComment(comment.content);
+    });
   }
 
-  function deleteComment(chair){
-    fetch(`http://localhost:3000/comments/${chair}`, {
-      method:'DELETE'
-    })
+  function renderId(comment) {}
+
+  function renderComment(comment) {
+    const commentsContainer = document.querySelector("#commentsUl");
+    const commentContent = document.createElement("li");
+    commentContent.textContent = comment;
+    commentsContainer.appendChild(commentContent);
   }
 
+  const commentsForm = document.querySelector("#comments-form");
+  commentsForm.addEventListener("submit", () => {
+    event.preventDefault();
+    getUserComment(commentsForm);
+  });
 
+  function getUserComment(commentsForm) {
+    const newFormData = new FormData(commentsForm);
+    const formComment = newFormData.get("comment");
+    renderComment(formComment);
+    sendUserComment(formComment);
+    console.log(formComment);
+  }
 
-})
+  function sendUserComment(comment) {}
+});
